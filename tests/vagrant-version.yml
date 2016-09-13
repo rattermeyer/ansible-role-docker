@@ -1,0 +1,8 @@
+- hosts: all
+  become: yes
+
+  vars:
+    docker_group_members: [ '{{ ansible_ssh_user }}' ]
+
+  roles:
+    - {role: ansible-role-docker, docker_pkg_version: '1.11.2-0~trusty' }
