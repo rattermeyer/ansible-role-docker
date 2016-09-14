@@ -31,13 +31,16 @@
     state: present
 
 - block:
-  - name: Install (or update) docker package at specific version
+  - name: Install docker package at specific version
     apt:
       name: "{{ docker_pkg_name }}={{docker_pkg_version}}"
       state: "{{ 'latest' if update_docker_package else 'present' }}"
       update_cache: yes
       cache_valid_time: "{{ docker_apt_cache_valid_time }}"
   - name: Install package fix
+    template:
+      src: apt-fix.j2
+      dest: /etc/apt/preferences.d/docker-engine
   when: docker_pkg_version != 'latest'
 
 - name: Install (or update) docker package
@@ -47,7 +50,6 @@
     update_cache: yes
     cache_valid_time: "{{ docker_apt_cache_valid_time }}"
   when: docker_pkg_version == 'latest'
-
 
 - name: Set docker daemon options
   copy:

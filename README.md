@@ -1,38 +1,81 @@
 Role Name
 =========
 
-A brief description of the role goes here.
+This role installs docker on the managed hosts. It builds upon [angstwad.docker](https://github.com/angstwad/docker.ubuntu) with few changes:
+
+* dropped support for ubuntu 12.04
+* allows installation of a specific docker version and installs a package fix (so update does not update version)
+* currently no ufw handling
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+Requires python-pycurl for apt modules.
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+These are the defaults, which can be set to present to prevent a reboot if the latest linux-image-extra, cgroup-lite packages are already installed. The following role variables are defined:
+
+```
+---
+# defaults file for ansible-role-docker
+# docker-engine is the default package name
+docker_pkg_name: docker-engine
+docker_pkg_version: latest
+docker_apt_cache_valid_time: 600
+
+# docker dns path for docker.io package ( changed at ubuntu 14.04 from docker to docker.io )
+docker_defaults_file_path: /etc/default/docker
+
+# Place to get apt repository key
+apt_key_url: hkp://p80.pool.sks-keyservers.net:80
+# apt repository key signature
+apt_key_sig: 58118E89F3A912897C070ADBF76221572C52609D
+# Name of the apt repository for docker
+apt_repository: deb https://apt.dockerproject.org/repo ubuntu-{{ ansible_distribution_release }} main
+# The following help expose a docker port or to add additional options when
+# running docker daemon.  The default is to not use any special options.
+#docker_opts: >
+#  -H unix://
+#  -H tcp://0.0.0.0:2375
+#  --log-level=debug
+docker_opts: ""
+# List of users to be added to 'docker' system group (disabled by default)
+# SECURITY WARNING:
+# Be aware that granted users can easily get full root access on the docker host system!
+docker_group_members: []
+# Flags for whether to install pip packages
+pip_install_pip: true
+pip_install_setuptools: true
+pip_install_docker_py: true
+pip_install_docker_compose: true
+# Versions for the python packages that are installed
+pip_version_pip: latest
+pip_version_setuptools: latest
+pip_version_docker_py: latest
+pip_version_docker_compose: latest
+
+# Set to 'yes' or 'true' to enable updates (sets 'latest' in apt module, and remove package fix)
+# Set to 'no' or 'false' to fix version (sets to the specific docker_version and installs apt package fix)
+update_docker_package: no
+```
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+None.
 
-Example Playbook
-----------------
+Testing
+-------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+To test the role in a Vagrant environment just run `vagrant up`.  This will
+create one VM based on Ubuntu 14.04,
+and it will provision them by applying this role with Ansible.
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+Requires `ansible-playbook` to be in the path.
 
 License
 -------
 
-BSD
-
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Apache v2.0
