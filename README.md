@@ -1,6 +1,5 @@
 Role Name
 =========
-
 This role installs docker on the managed hosts. It builds upon [angstwad.docker](https://github.com/angstwad/docker.ubuntu) with few changes:
 
 * dropped support for ubuntu 12.04
