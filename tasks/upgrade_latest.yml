@@ -1,0 +1,17 @@
+- name: Get current version
+  shell: pip list | grep {{item.name}} | sed -E 's/\((.*)\)/\1/' | awk '{print $2}'
+  register: current_version
+  changed_when: False
+- name: Upgrade latest pip, setuptools, docker-py and docker-compose with pip
+  pip:
+    name: "{{ item.name }}"
+    state: latest
+  ignore_errors: yes
+  changed_when: False
+  tags:
+  - skip_ansible_lint
+- name: Get latest version
+  shell: pip list | grep {{item.name}} | sed -E 's/\((.*)\)/\1/' | awk '{print $2}'
+  register: latest_version
+  changed_when: "latest_version.stdout != current_version.stdout"
+- debug: msg="latest='{{latest_version.stdout}}'    current={{current_version.stdout}}"
