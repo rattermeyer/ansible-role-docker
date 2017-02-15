@@ -7,8 +7,8 @@ ENV['ANSIBLE_ROLES_PATH'] = "../"
 
 boxes = [
   {
-    :name => "ubuntu-1404",
-    :box => "ubuntu/trusty64",
+    :name => "ubuntu-1604",
+    :box => "geerlingguy/ubuntu1604",
     :ip => '10.0.0.12',
     :cpu => "50",
     :ram => "256"

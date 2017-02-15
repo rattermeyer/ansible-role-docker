@@ -16,6 +16,8 @@
 
 - name: Alternative | Add Docker repository key
   shell: "curl -sSL {{ apt_key_url }} | sudo apt-key add -"
+  args:
+    warn: False
   when: add_repository_key|failed
 
 - name: HTTPS APT transport for Docker repository
@@ -50,6 +52,15 @@
     update_cache: yes
     cache_valid_time: "{{ docker_apt_cache_valid_time }}"
   when: docker_pkg_version == 'latest'
+
+- name: Install daemon.json
+  template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+  notify:
+    - Restart docker
+  tags:
+  - daemon_json
 
 - name: Set docker daemon options
   copy:
@@ -104,20 +115,19 @@
   with_items:
     - python-dev
     - python-pip
+  tags:
+  - skip_ansible_lint
+
 
 # Upgrade pip with pip to fix angstwad/docker.ubuntu/pull/35 and docker-py/issues/525
 # Install latest version when no specific release is set.
-- name: Upgrade latest pip, setuptools, docker-py and docker-compose with pip
-  pip:
-    name: "{{ item.name }}"
-    state: latest
+- include: "upgrade_latest.yml"
   with_items:
-    - { name: pip, version: "{{ pip_version_pip }}", install: "{{ pip_install_pip }}" }
-    - { name: setuptools, version: "{{ pip_version_setuptools }}", install: "{{ pip_install_setuptools }}" }
-    - { name: docker-py, version: "{{ pip_version_docker_py }}", install: "{{ pip_install_docker_py }}" }
-    - { name: docker-compose, version: "{{ pip_version_docker_compose }}", install: "{{ pip_install_docker_compose }}" }
+  - { name: pip, version: "{{ pip_version_pip }}", install: "{{ pip_install_pip }}" }
+  - { name: setuptools, version: "{{ pip_version_setuptools }}", install: "{{ pip_install_setuptools }}" }
+  - { name: docker-py, version: "{{ pip_version_docker_py }}", install: "{{ pip_install_docker_py }}" }
+  - { name: docker-compose, version: "{{ pip_version_docker_compose }}", install: "{{ pip_install_docker_compose }}" }
   when: (item.version=="latest" and item.install)
-  ignore_errors: yes
 
 # Install specific version when set in the variables
 - name: Install specific pip, setuptools, docker-py and docker-compose with pip

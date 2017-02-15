@@ -5,6 +5,7 @@ docker_pkg_name: docker-engine
 docker_pkg_version: latest
 docker_apt_cache_valid_time: 600
 
+docker_tls: false
 # docker dns path for docker.io package ( changed at ubuntu 14.04 from docker to docker.io )
 docker_defaults_file_path: /etc/default/docker
 
@@ -20,7 +21,7 @@ apt_repository: deb https://apt.dockerproject.org/repo ubuntu-{{ ansible_distrib
 #  -H unix://
 #  -H tcp://0.0.0.0:2375
 #  --log-level=debug
-docker_opts: ""
+docker_opts: "--config-file=/etc/docker/daemon.json"
 # List of users to be added to 'docker' system group (disabled by default)
 # SECURITY WARNING:
 # Be aware that granted users can easily get full root access on the docker host system!
