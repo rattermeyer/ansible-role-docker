@@ -53,6 +53,11 @@
     cache_valid_time: "{{ docker_apt_cache_valid_time }}"
   when: docker_pkg_version == 'latest'
 
+- name: Ensure /etc/docker exists
+  file:
+    path: /etc/docker
+    state: directory
+
 - name: Install daemon.json
   template:
     src: daemon.json.j2
@@ -72,6 +77,9 @@
   notify:
     - Restart docker
   when: docker_opts != "" and ansible_distribution_version|version_compare(15.04, '<')
+
+- name: "debug"
+  debug: msg="docker_opts={{docker_opts}} and ansible_distribution_version={{ansible_distribution_version}}"
 
 - name: Create systemd configuration directory for Docker service (systemd)
   file:
